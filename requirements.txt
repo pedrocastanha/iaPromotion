@@ -7,3 +7,7 @@ faiss-cpu
 sentence-transformers
 python-dotenv
 numpy
+pinecone
+langchain-community
+langchain_google_genai
+langchain-text-splitters
