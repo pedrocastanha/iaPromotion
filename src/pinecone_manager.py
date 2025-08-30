@@ -48,7 +48,7 @@ class PineconeManager:
 
             if self.namespace in stats.namespaces and stats.namespaces[self.namespace].vector_count > 0:
                 logger.info(
-                    f"Namespace '{self.namespace}' já contém {stats.namespaces[self.namespace].vector_count} vetores.")
+                    f"Namespace '{self.namespace}' already contains  {stats.namespaces[self.namespace].vector_count} vectors.")
                 return True
             else:
                 logger.info(f"Namespace '{self.namespace}' is empty or does not exist in the statistics.")
@@ -98,7 +98,7 @@ class PineconeManager:
                         "values": embedding,
                         "metadata": {"text": chunk}
                     })
-                logger.info(f"Lote {i//batch_size + 1} de embeddings gerado com sucesso.")
+                logger.info(f"batch {i//batch_size + 1} of embeddings sucessfully generated.")
             except Exception as e:
                 logger.error(f"Error to process lote {i // batch_size + 1}: {e}")
                 continue
@@ -134,7 +134,7 @@ class PineconeManager:
 
     def delete_all_vectors(self) -> bool:
         try:
-            logger.info(f"Iniciando a limpeza do namespace: '{self.namespace}'...")
+            logger.info(f"Starting namespace cleanup: '{self.namespace}'...")
             self.index.delete(delete_all=True, namespace=self.namespace)
             logger.info(f"Namespace '{self.namespace}' successfully cleaned.")
             return True

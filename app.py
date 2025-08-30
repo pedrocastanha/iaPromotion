@@ -106,7 +106,7 @@ async def clear_documents(request: Request):
                 "message": f"namespace '{bot_instance.pinecone_manager.namespace}' was successfully cleaned."
             }
         else:
-            raise HTTPException(status_code=500, detail="erro when trying to clean the vector store.")
+            raise HTTPException(status_code=500, detail="error when trying to clean the vector store.")
     except Exception as e:
         logger.exception("Error during vector store clearing.")
         raise HTTPException(status_code=500, detail=f"internal error: {str(e)}")

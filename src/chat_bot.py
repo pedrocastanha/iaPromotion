@@ -5,6 +5,7 @@ from typing import List
 from .gemini_integration import GeminiIntegration
 from .pinecone_manager import PineconeManager
 from .docx_processor import DocxProcessor
+from .schemas import ChatResponse
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
