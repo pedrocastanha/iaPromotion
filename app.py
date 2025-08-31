@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI, HTTPException, Request
 from src.chat_bot import ChatBot
 from dotenv import load_dotenv
-from src.schemas import ChatRequest
+from src.schemas import ChatRequest, ChatResponse
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ async def startup_event():
         app.state.chatbot = None
 
 
-@app.post("/chat", response_model=dict)
+@app.post("/chat", response_model=ChatResponse)
 async def chat_route(request: Request, request_body: ChatRequest):
     bot_instance = request.app.state.chatbot
     if bot_instance is None:
@@ -45,7 +45,7 @@ async def chat_route(request: Request, request_body: ChatRequest):
 
     if not bot_instance.is_ready():
         raise HTTPException(status_code=400,
-                            detail="Documents was not processed. Please, call /process-documents first.")
+                            detail="Documents were not processed. Please, call /process-documents first.")
 
     user_message = request_body.message
     company_name = request_body.company_name
@@ -55,17 +55,15 @@ async def chat_route(request: Request, request_body: ChatRequest):
         raise HTTPException(status_code=400, detail="The 'message' field cannot be empty.")
 
     try:
-        prompt = (
-            f"Empresa: {company_name}\n"
-            f"Tipo da empresa: {company_type}\n"
-            f"Mensagem do usuário: {user_message}"
+        bot_response = bot_instance.get_response(
+            query=user_message,
+            company_name=company_name,
+            company_type=company_type
         )
-        bot_response = bot_instance.get_response(prompt)
-        return {"response": bot_response}
+        return bot_response
     except Exception as e:
         logger.exception("An error occurred during get_response")
         raise HTTPException(status_code=500, detail="An internal error occurred.")
-
 
 @app.post("/process-documents")
 async def process_documents(request: Request):

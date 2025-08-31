@@ -63,15 +63,43 @@ class ChatBot:
     def is_ready(self) -> bool:
         return self._documents_loaded
 
-    def get_response(self, query: str) -> str:
+    def get_response(self, query: str, company_name: str, company_type: str) -> ChatResponse:
         if not self.is_ready():
-            return "The documents have not been processed yet. Please initiate processing first."
-
+                return ChatResponse(
+                    initial="The documents have not been processed yet. Please start processing first.",
+                    promotion="",
+                    information="",
+                    invite=""
+                )
         try:
             relevant_chunks = self.pinecone_manager.search_documents(query, k=5)
             if relevant_chunks:
                 context = "\n\n".join(relevant_chunks)
-                prompt = f"Com base no seguinte contexto, responda à pergunta do usuário: CONTEXTO: {context}\n\nPERGUNTA: {query}"
+                prompt = f"""
+                   # Você é um assistente de promoções. Sua tarefa é criar uma mensagem promocional com base no contexto fornecido e com base nas informações do usuário, em seguida, criar uma resposta estruturada em formato JSON.
+                   O JSON de saída deve seguir estritamente esta estrutura com os quatro campos: "initial", "promotion", "information" e "invite".
+                   ## Exemplo de formato de saída:
+                   {{
+                     "initial": "Olá, [nome do cliente], tudo bem?",
+                     "promotion": "Hoje tem supresa boa te esperando aqui! preparamos uma noite especial com promoção de vinhos e degustação.",
+                     "information": "Das 18:00 às 22:00, o vinho DiMallo estará com um preço imperdível, por apenas *R$49,98!*."
+                     "invite": "Já convida seus amigos e vem brindar com a gente!"
+                   }}
+
+                   ## DADOS PARA GERAR A RESPOSTA 
+                    Nome da Empresa: {company_name}
+                    Tipo da Empresa: {company_type}
+                    Mensagem do Usuário: {query}
+                    Contexto de Documentos: {context}
+
+                   ## JSON OBRIGATÓRIO DE SAÍDA ---
+                   {{
+                        "initial": ""
+                        "promotion": ""
+                        "information": ""
+                        "invite": ""
+                   }}
+                """
             else:
                 prompt = f"Não encontrei informações nos documentos. Responda com base no seu conhecimento geral: {query}"
 

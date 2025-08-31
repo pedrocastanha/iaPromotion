@@ -8,4 +8,5 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     initial: str
     promotion: str
-    call: str
+    information: str
+    invite: str
